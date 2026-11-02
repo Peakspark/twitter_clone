@@ -1,8 +1,8 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 
-router.post('/signup' , async(req,res)=>{
-    res.send("Succesfull")
-} );
+const { signup } = require('../controllers/authcontroller.js');
 
-module.exports = router ;
+router.post('/signup', signup);
+
+module.exports = router;

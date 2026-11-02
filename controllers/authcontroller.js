@@ -1,69 +1,67 @@
-import User from "../prisma/schema.prisma"
-//signup
+const User = require('../models/authmodel.js');
+const bcrypt = require('bcrypt');
 
-export const signup = async(req,res)=>{
-    //check all feilds 
-    try{
-        const {name , email , password} = req.body ;
-
-        if(!name || !email || !password ){
-            return res.status(400).json({
-                success : false ,
-                message : "ALL feilds are required"
-            });
-        }
-
-        const Normalisedemail = email.trim.toLowerCase()
-
-        const existinguser = await  User.findOne({
-            email : Normalisedemail
-        })
-
-        if(email == existinguser){
-            return res.status(400).json({
-                success : false ,
-                message : "Email dosent exist"
+const signup = async (req,res)=>{
+    try {
+        const {name , email , password} = req.body;
+        // check all feilds 
+        if (!name || !email || !password){
+            res.status(400).json({
+                message : "all feilds are required"
             })
         }
+        const name_normal = name.trim()
+        const email_normal = email.trim().toLowerCase()
+        const hash_p = await  bcrypt.hash(password , 10)
 
-        const createuser = await User.create({
-            name : name , 
-            email : Normalisedemail , 
-            password : password
+        // check user already exist or not 
+
+        const find_user = await User.findOne({
+            email
         })
-        
-        
+
+        if(find_user){
+            res.status(200).json({
+                message : "please login user already exist"
+            })
+            console.log("please login")
+        }
+        //create user 
+        const new_user = await User.create({
+            name : name_normal ,
+            email : email_normal,
+            password : hash_p
+        })
+        if(new_user){
+            res.status(201).json({
+                message : "user created "
+            })
+        }
     }
     catch{
-
+        console.log("incoorect")
     }
-};
+}
+//login 
+const login = async(req , res)=>{
+    try {
+    const {email , name , password} = req.body ;
 
-export const login = async(req,res)=>{
-    try{
-    const {email , password } = req.body 
-    
-    const useremail = await User.findone({
-        email 
-    });
-
-    if (!usermail){
-        return req.send(400).json({
-            message : "User not found please register!"
-        });
-    }
-    const ispasswordcorrect = await bcrypt.comapre(password , useremail.password);
-    if(!ispasswordcorrect){
-        return res.status(401).json({
-            success : false ,
-            message : "Invalid email or password "
-        });
-    }
-    return res.send(200).json({
-        message : "Login Succesfull"
+    //user not exist 
+    const email_normal = User.findOne({
+        email
     })
+    if(!email_normal){
+        res.status(400).json({
+            message: "user not exist please signup"
+        })
     }
-    catch{
+    //login
+    
+    
+    }
+    catch{}
+    
+}
 
-    }
-};
+module.exports = {signup};
