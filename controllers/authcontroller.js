@@ -24,7 +24,7 @@ export const signup = async (req, res) => {
         ) {
             return res.status(400).json({
                 success: false,
-                message: "Invalid input"
+                message: "Invlid input"
             });
         }
 
