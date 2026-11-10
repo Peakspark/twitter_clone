@@ -26,3 +26,34 @@ router.post('/', async (req, res, next) => {
     next(error);
   }
 });
+
+
+// GET /api/posts?limit=20&page=1
+router.get('/', async (req, res, next) => {
+  try {
+    const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 20, 1), 100);
+    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    const [posts, total] = await Promise.all([
+      Post.find().sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit).lean(),
+      Post.countDocuments(),
+    ]);
+
+    return res.json({ posts, page, limit, total });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// GET /api/posts/:id
+router.get('/:id', async (req, res, next) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ error: 'Invalid post id' });
+    }
+    const post = await Post.findById(req.params.id).lean();
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+    return res.json({ post });
+  } catch (error) {
+    next(error);
+  }
+});
