@@ -57,3 +57,25 @@ router.get('/:id', async (req, res, next) => {
     next(error);
   }
 });
+
+// DELETE /api/posts/:id
+// Body: { "authorId": "<MongoDB ObjectId>" }
+router.delete('/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { authorId } = req.body;
+    if (!mongoose.isValidObjectId(id) || !mongoose.isValidObjectId(authorId)) {
+      return res.status(400).json({ error: 'Valid post id and authorId are required' });
+    }
+
+    // The owner check is useful for local development. In production, get the
+    // author id from verified authentication middleware, never from the body.
+    const post = await Post.findOneAndDelete({ _id: id, authorId });
+    if (!post) return res.status(404).json({ error: 'Post not found for this author' });
+    return res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+});
+
+module.exports = router;
