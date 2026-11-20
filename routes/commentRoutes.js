@@ -5,7 +5,6 @@ const {
   deleteComment
 } = require('../controllers/commentController');
 const authMiddleware = require('../middlewares/authMiddleware');
-
 const router = express.Router();
 
 // Anyone can read comments for a post.
