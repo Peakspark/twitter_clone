@@ -2,14 +2,21 @@ const mongoose = require('mongoose');
 
 const likeSchema = new mongoose.Schema(
   {
-    postId: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', required: true },
-    userId: { type: mongoose.Schema.Types.ObjectId, required: true },
+    post: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Post',
+      required: true
+    },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    }
   },
   { timestamps: true }
 );
 
-// A user can like a post only once.
-likeSchema.index({ postId: 1, userId: 1 }, { unique: true });
-likeSchema.index({ postId: 1 });
+// Prevent a user from liking the same post more than once.
+likeSchema.index({ post: 1, user: 1 }, { unique: true });
 
 module.exports = mongoose.model('Like', likeSchema);

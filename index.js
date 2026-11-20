@@ -1,55 +1,42 @@
 require('dotenv').config();
 
 const express = require('express');
+const connectDB = require('./config/db');
+
+const authRoutes = require('./routes/authRoutes');
+const postRoutes = require('./routes/postRoutes');
+const likeRoutes = require('./routes/likeRoutes');
+const commentRoutes = require('./routes/commentRoutes');
+
 const app = express();
 const port = process.env.PORT || 3000;
 
-const authroutes = require('./routes/authroutes');
-const connectDB = require('./config/db.js');
+app.use(express.json());
 
-// Twitter API feature routes
-const postRoutes = require('./src/routes/posts');
-const commentRoutes = require('./src/routes/comments');
-const likeRoutes = require('./src/routes/likes');
-
-// Middleware
-app.use(express.json({ limit: '16kbb' }));
-
-// Home route
-app.get('/', (req, res) => {
-    res.send('Hello World!');
+app.get('/', (_req, res) => {
+  res.json({ message: 'Twitter backend API is running' });
 });
 
-// Authentication routes
-app.use('/auth', authroutes);
+app.use('/auth', authRoutes);
+app.use('/posts', postRoutes);
+app.use('/posts', likeRoutes);
+app.use('/', commentRoutes);
 
-// Post, comment, and like routes
-app.use('/api/posts', postRoutes);
-app.use('/api', commentRoutes);
-app.use('/api', likeRoutes);
-
-// Handle invalid JSON and unexpected errors
-
-app.use((error, req, res, next) => {
-    console.error(error);
-    if (error instanceof SyntaxError && error.status === 400 && 'body' in error) {
-        return res.status(400).json({ error: 'Invalid JSON body' });
-    }
-    return res.status(500).json({ error: 'Internal server error' });
+app.use((req, res) => {
+  res.status(404).json({ success: false, message: 'Route not found' });
 });
 
-// Start server only after the database connection succeeds
 const startServer = async () => {
-    try {
-        await connectDB();
+  try {
+    await connectDB();
 
-        app.listen(port, () => {
-            console.log(`Server is running on port ${port}`);
-        });
-    } catch (error) {
-        console.error('Failed to start server:', error.message);
-        process.exit(1);
-    }
+    app.listen(port, () => {
+      console.log(`Server is running at http://localhost:${port}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error.message);
+    process.exit(1);
+  }
 };
 
 startServer();
