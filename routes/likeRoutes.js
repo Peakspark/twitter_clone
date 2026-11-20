@@ -5,7 +5,6 @@ const {
   getLikes
 } = require('../controllers/likeController');
 const authMiddleware = require('../middlewares/authMiddleware');
-
 const router = express.Router();
 
 // Signed-in users can like or unlike a post.
