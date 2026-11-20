@@ -4,8 +4,7 @@ const {
   getPosts,
   deletePost
 } = require('../controllers/postController');
-const authMiddleware = require('../middlewares/authmiddleware');
-
+const authMiddleware = require('../middlewares/authMiddleware');
 const router = express.Router();
 
 // Anyone can view posts
