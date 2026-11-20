@@ -13,7 +13,7 @@ const commentRoutes = require('./src/routes/comments');
 const likeRoutes = require('./src/routes/likes');
 
 // Middleware
-app.use(express.json({ limit: '16kb' }));
+app.use(express.json({ limit: '16kbb' }));
 
 // Home route
 app.get('/', (req, res) => {
